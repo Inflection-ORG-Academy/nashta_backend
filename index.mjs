@@ -1,16 +1,18 @@
 import express from 'express'
 import { prisma } from "./prisma/prisma_client.mjs"
+import bcrypt from 'bcrypt'
 const PORT = 5000
 const app = express()
 app.use(express.json())
 
 app.post("/signup", async (req, res) => {
-  console.log(req.body)
+  const hashedPassword = await bcrypt.hash(req.body.password, 10)
   const user = await prisma.user.create({
     data: {
       email: req.body.email,
       name: req.body.name,
-      password: req.body.password,
+      password: hashedPassword,
+      address: req.body.address
     }
   })
   res.json(user)
@@ -28,13 +30,15 @@ app.post("/login", async (req, res) => {
     })
     return
   }
-  if (user.password !== req.body.password) {
+  const isMatched = await bcrypt.compare(req.body.password, user.password)
+  if (!isMatched) {
     res.status(401).json({
       "error": "password not matched"
     })
     return
   }
-  res.json({ message: "login successful" })
+  // TODO: generate token
+  res.json({ message: `login successful, welcome ${user.name}` })
 })
 
 app.listen(PORT, () => {
