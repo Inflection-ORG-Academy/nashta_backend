@@ -76,10 +76,10 @@ app.patch("/forget_password", async (req, res) => {
       id: user.id
     },
     data: {
-      otp: strOTP
+      otp: strOTP,
+      otpGeneratedAt: new Date(Date.now())
     }
   })
-
 
   // 4. send email
   await sendOTP(user.email, strOTP)
