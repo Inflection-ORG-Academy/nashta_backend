@@ -88,6 +88,47 @@ app.patch("/forget_password", async (req, res) => {
   res.json({ message: "check your email" })
 })
 
+app.patch("/reset_password", async (req, res) => {
+  // 1. find user from email
+  const user = await prisma.user.findUnique({
+    where: {
+      email: req.body.email
+    },
+  })
+  if (!user) {
+    res.status(404).json({ error: "user not found" })
+    return
+  }
+  // 2. match otp
+  if (req.body.otp !== user.otp) {
+    res.status(401).json({ error: "invalid otp" })
+    return
+  }
+  // 3. check for otp expiry
+  const otpValidityMin = 50 // minute
+  if (Date.now() - user.otpGeneratedAt.getTime() > otpValidityMin * 60 * 1000) {
+    res.status(401).json({ error: "otp expired" })
+    return
+  }
+
+  // 4. hash new password
+
+  const hashedPass = await bcrypt.hash(req.body.new_password, 10)
+  // 5. update hashed password in DB
+  await prisma.user.update({
+    where: {
+      id: user.id
+    },
+    data: {
+      otp: null,
+      password: hashedPass
+    }
+  })
+
+  // send response to user
+  res.json({ message: "password reset successful" })
+})
+
 app.listen(PORT, () => {
   console.log(`server started on ${PORT}`)
 })
