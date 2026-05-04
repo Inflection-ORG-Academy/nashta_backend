@@ -15,4 +15,17 @@ model User {
   address        String?
   otp            String?
   otpGeneratedAt DateTime?
+  menus          Menu[]
+}
+
+model Menu {
+  id          Int      @id @default(autoincrement())
+  name        String   @unique
+  description String?
+  price_half  Int
+  price_full  Int
+  thumbnail   String
+  user        User     @relation(fields: [created_by], references: [id])
+  created_by  Int
+  created_at  DateTime @default(now())
 }
