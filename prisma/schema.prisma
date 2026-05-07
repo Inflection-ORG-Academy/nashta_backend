@@ -24,8 +24,8 @@ model Menu {
   description String?
   price_half  Int
   price_full  Int
-  thumbnail   String
-  user        User     @relation(fields: [created_by], references: [id])
-  created_by  Int
+  thumbnail   String?
+  user        User?    @relation(fields: [created_by], references: [id])
+  created_by  Int?
   created_at  DateTime @default(now())
 }
