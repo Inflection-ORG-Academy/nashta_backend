@@ -2,12 +2,14 @@ import { prisma } from "../prisma/prisma_client.mjs"
 
 const createMenu = async (req, res) => {
   console.log(req.body)
+  console.log(req.test)
   const menu = await prisma.menu.create({
     data: {
       name: req.body.name,
       description: req.body.description,
       price_half: req.body.price_half,
-      price_full: req.body.price_full
+      price_full: req.body.price_full,
+      created_by: req.user.id
     }
   })
   res.json(menu)

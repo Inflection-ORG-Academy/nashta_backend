@@ -7,6 +7,7 @@ const app = express()
 
 app.use(express.json()) // body parser
 app.use((req, res, next) => {
+  req.test = "apple"
   console.log("global middlware, runs on every route")
   next()
 })
