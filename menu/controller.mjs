@@ -16,11 +16,24 @@ const createMenu = async (req, res) => {
 }
 
 const getMenus = async (req, res) => {
-  res.json({ key: "get menus" })
+  const page = parseInt(req.query.page)
+  const limit = parseInt(req.query.limit)
+  if (isNaN(page) || isNaN(limit)) {
+    res.status(400).json({
+      error: "pagination not ok"
+    })
+  }
+  const menus = await prisma.menu.findMany({
+    skip: (page - 1) * limit,
+    take: limit,
+  })
+  res.json(menus)
 }
+
 const updateMenu = async (req, res) => {
   res.json({ key: "update menu" })
 }
+
 const deleteMenu = async (req, res) => {
   res.json({ key: "delete menu" })
 }
